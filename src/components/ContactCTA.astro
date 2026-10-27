@@ -1,0 +1,92 @@
+---
+---
+
+<section id="contacto" class="py-28 relative overflow-hidden">
+  <div class="max-w-5xl mx-auto px-6 relative z-10">
+    <div class="glass-panel-relay rounded-3xl p-8 sm:p-14 border border-white/[0.12] text-center relative overflow-hidden shadow-2xl">
+      <!-- Background stream glow -->
+      <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-96 h-96 bg-lime-400/15 rounded-full blur-[100px] pointer-events-none"></div>
+
+      <div class="inline-flex items-center gap-2 text-lime-400 font-mono text-xs uppercase tracking-widest mb-4">
+        <span class="w-2 h-2 rounded-full bg-lime-400 animate-pulse"></span>
+        Hablemos de tus Desafíos TI
+      </div>
+
+      <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-4">
+        ¿Listo para blindar tu operación tecnológica?
+      </h2>
+
+      <p class="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto mb-10 leading-relaxed">
+        Agendá una sesión técnica con nuestros líderes en arquitectura y gobernanza TI. Evaluamos tu infraestructura actual y proyectamos el roadmap adecuado.
+      </p>
+
+      <form class="max-w-xl mx-auto space-y-4 text-left" id="consulting-form">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-mono text-slate-300 uppercase mb-1">Nombre Completo</label>
+            <input 
+              type="text" 
+              placeholder="Ej. Roberto Gómez" 
+              required
+              class="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.1] focus:border-lime-400 focus:outline-none text-white text-sm placeholder:text-slate-600 transition-colors"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-mono text-slate-300 uppercase mb-1">Email Corporativo</label>
+            <input 
+              type="email" 
+              placeholder="roberto@empresa.com" 
+              required
+              class="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.1] focus:border-lime-400 focus:outline-none text-white text-sm placeholder:text-slate-600 transition-colors"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-mono text-slate-300 uppercase mb-1">Servicio de Interés Principal</label>
+          <select class="w-full px-4 py-3 rounded-xl bg-[#090d14] border border-white/[0.1] focus:border-lime-400 focus:outline-none text-white text-sm transition-colors">
+            <option value="bi">Reportes y Análisis BI</option>
+            <option value="custom">Desarrollo de Software a Medida</option>
+            <option value="microservices">Consultoría en Microservicios</option>
+            <option value="cobit">Segregación de Funciones (COBIT)</option>
+            <option value="servicedesk">Mesa de Servicio & ITIL</option>
+            <option value="all">Ecosistema Completo de TI</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-mono text-slate-300 uppercase mb-1">Detalle del Requerimiento</label>
+          <textarea 
+            rows="3" 
+            placeholder="Describí brevemente el objetivo, tecnologías actuales o volumen estimado..."
+            class="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.1] focus:border-lime-400 focus:outline-none text-white text-sm placeholder:text-slate-600 transition-colors"
+          ></textarea>
+        </div>
+
+        <button 
+          type="submit" 
+          class="w-full py-4 rounded-xl font-bold text-xs uppercase font-mono tracking-wider text-black bg-lime-400 hover:bg-lime-300 transition-all duration-300 shadow-[0_0_25px_rgba(200,255,0,0.4)] hover:scale-[1.01] active:scale-95"
+        >
+          Solicitar Evaluación Técnica
+        </button>
+      </form>
+
+      <div class="mt-8 text-xs font-mono text-slate-400">
+        Acuerdo de Confidencialidad (NDA) disponible antes de cualquier diagnóstico.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="py-12 border-t border-white/[0.08] bg-[#04060a] text-slate-500 text-xs font-mono">
+  <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-2 text-slate-300">
+      <span class="font-extrabold text-white tracking-wider">NEXUS.TI</span>
+      <span>— Consultoría TI & Arquitectura de Software</span>
+    </div>
+    <div>
+      © {new Date().getFullYear()} NEXUS TI. Todos los derechos reservados.
+    </div>
+  </div>
+</footer>

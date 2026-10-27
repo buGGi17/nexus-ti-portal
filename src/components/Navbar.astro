@@ -1,0 +1,72 @@
+---
+---
+
+<header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-xl bg-[#04060a]/70 border-b border-white/[0.07]">
+  <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+    <!-- Brand Logo inspired by Relay -->
+    <a href="#hero" class="flex items-center gap-3.5 group">
+      <div class="relative w-10 h-10 rounded-xl bg-gradient-to-tr from-lime-400/20 to-lime-500/5 border border-lime-400/30 flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:border-lime-400 group-hover:shadow-[0_0_25px_rgba(200,255,0,0.35)]">
+        <div class="w-4 h-4 rounded-full border-2 border-lime-400 border-t-transparent animate-spin"></div>
+        <div class="absolute inset-0 rounded-xl bg-lime-400/10 blur-sm -z-10"></div>
+      </div>
+      <div class="flex flex-col">
+        <span class="font-extrabold tracking-tight text-white flex items-center gap-1.5 text-lg">
+          NEXUS<span class="text-lime-400 font-mono text-sm tracking-widest font-normal">.TI</span>
+        </span>
+        <span class="text-[10px] text-slate-400 tracking-wider uppercase font-mono">Enterprise Engineering</span>
+      </div>
+    </a>
+
+    <!-- Navigation links -->
+    <nav class="hidden md:flex items-center gap-8 text-xs font-mono tracking-wider uppercase text-slate-300">
+      <a href="#servicios" class="hover:text-lime-400 transition-colors">01. Servicios</a>
+      <a href="#soluciones" class="hover:text-lime-400 transition-colors">02. Arquitectura</a>
+      <a href="#gobierno" class="hover:text-lime-400 transition-colors">03. COBIT & ITIL</a>
+      <a href="#contacto" class="hover:text-lime-400 transition-colors">04. Contacto</a>
+    </nav>
+
+    <!-- PWA Install / CTA Button -->
+    <div class="flex items-center gap-3">
+      <button 
+        id="pwa-install-btn" 
+        class="hidden px-3.5 py-2 text-xs font-mono font-medium text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-all items-center gap-2"
+      >
+        <span class="w-1.5 h-1.5 rounded-full bg-lime-400"></span>
+        Instalar App
+      </button>
+
+      <a 
+        href="#contacto" 
+        class="relative inline-flex items-center justify-center px-4 py-2 text-xs font-mono font-semibold text-black bg-lime-400 hover:bg-lime-300 rounded-lg transition-all duration-300 shadow-[0_0_20px_rgba(200,255,0,0.3)] hover:scale-105 active:scale-95"
+      >
+        <span>Agendar Consulta</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<script>
+  let deferredPrompt: any;
+  const installBtn = document.getElementById('pwa-install-btn');
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (installBtn) {
+      installBtn.classList.remove('hidden');
+      installBtn.classList.add('inline-flex');
+    }
+  });
+
+  if (installBtn) {
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        installBtn.classList.add('hidden');
+      }
+      deferredPrompt = null;
+    });
+  }
+</script>

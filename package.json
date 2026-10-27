@@ -1,0 +1,26 @@
+{
+  "name": "website-v1",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev --host",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/tailwind": "^6.0.2",
+    "@types/canvas-confetti": "^1.9.0",
+    "@vite-pwa/astro": "^1.2.0",
+    "astro": "^5.18.2",
+    "canvas-confetti": "^1.9.4",
+    "lucide": "^1.16.0",
+    "tailwind-merge": "^3.5.0",
+    "tailwindcss": "^3.4.17",
+    "three": "^0.183.2",
+    "workbox-window": "^7.4.1"
+  },
+  "devDependencies": {
+    "@types/three": "^0.183.1"
+  }
+}

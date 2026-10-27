@@ -1,0 +1,173 @@
+---
+const services = [
+  {
+    id: "bi-analytics",
+    tag: "Data & BI",
+    title: "Reportes y Análisis BI",
+    desc: "Ingeniería de datos moderna, modelado dimensional en estrella, Data Warehouses (Snowflake, BigQuery) y tableros interactivos para toma de decisiones ejecutivas en tiempo real.",
+    metrics: ["Dashboards PowerBI & Looker", "Pipelines dbt / Airflow", "Modelado Semántico OLAP"],
+    color: "from-lime-400/20 to-transparent",
+    statusText: "99.9% Freshness"
+  },
+  {
+    id: "software-custom",
+    tag: "Ingeniería a Medida",
+    title: "Desarrollo de Software a Medida",
+    desc: "Construcción de aplicaciones empresariales robustas con arquitectura limpia (Clean Architecture, DDD), tipado estricto, microfrontends y ciclos de entrega continua CI/CD con TDD.",
+    metrics: ["Domain-Driven Design (DDD)", "TypeScript / Go / Java / Python", "Cero Deuda Técnica"],
+    color: "from-cyan-400/20 to-transparent",
+    statusText: "Clean Hexagonal Code"
+  },
+  {
+    id: "microservices",
+    tag: "Cloud Native",
+    title: "Consultoría en Microservicios",
+    desc: "Migración de monolitos a mallas de microservicios desacoplados. Orquestación en Kubernetes, Service Mesh (Istio), mensajería asíncrona Kafka y trazabilidad OpenTelemetry.",
+    metrics: ["Event-Driven & CQRS", "Kubernetes & Service Mesh", "Observabilidad OpenTelemetry"],
+    color: "from-lime-400/20 to-transparent",
+    statusText: "Zero-Downtime Releases"
+  },
+  {
+    id: "cobit-sod",
+    tag: "Gobierno Corporativo",
+    title: "Segregación de Funciones (COBIT)",
+    desc: "Diseño y auditoría de matrices SoD (Segregation of Duties) bajo el marco COBIT 2019 e ISO 27001 para mitigar fraudes operacionales y conflictos de privilegios en sistemas ERPs.",
+    metrics: ["Matriz SoD Incompatibilidades", "Alineamiento COBIT 2019", "Mitigación Fraude TI"],
+    color: "from-cyan-400/20 to-transparent",
+    statusText: "100% Audit Proof"
+  },
+  {
+    id: "service-desk",
+    tag: "Operaciones 24/7",
+    title: "Mesa de Servicio (Service Desk)",
+    desc: "Centro de soporte técnico unificado para niveles N1, N2 y N3 con SLAs estrictos, canales omnicanal automatizados y resolución de incidentes críticos orientada al negocio.",
+    metrics: ["Soporte 24/7 Monitoreado", "Resolución Primer Contacto", "Herramientas ITSM Cloud"],
+    color: "from-lime-400/20 to-transparent",
+    statusText: "MTTR < 20 min"
+  },
+  {
+    id: "itil-framework",
+    tag: "Gestión de Servicios",
+    title: "Gobierno ITIL & Mejora Continua",
+    desc: "Implementación de procesos ITIL 4 de extremo a extremo: Gestión de Incidentes, Problemas, Comité de Cambios (CAB), CMDB y acuerdos de nivel de servicio (SLAs) medibles.",
+    metrics: ["Alineamiento ITIL 4", "CMDB & Control de Cambios", "Reducción Incidentes Recurrentes"],
+    color: "from-cyan-400/20 to-transparent",
+    statusText: "ITIL 4 Certified"
+  }
+];
+---
+
+<section id="servicios" class="py-28 relative z-10">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+      <div>
+        <div class="inline-flex items-center gap-2 text-lime-400 font-mono text-xs uppercase tracking-widest mb-3">
+          <span class="w-1.5 h-1.5 bg-lime-400 rounded-full animate-pulse"></span>
+          Catálogo Especializado
+        </div>
+        <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+          Ingeniería y Gobernanza <br class="hidden sm:inline" />
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-lime-400 via-emerald-300 to-cyan-400">
+            con arquitectura probada.
+          </span>
+        </h2>
+      </div>
+      <p class="text-slate-400 max-w-md text-sm leading-relaxed font-sans">
+        Mové el mouse o desplazate sobre las tarjetas para explorar los entregables técnicos y métricas de cada especialidad.
+      </p>
+    </div>
+
+    <!-- Cards Grid with Luxury Relay Glassmorphism -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="services-tilt-grid">
+      {services.map((item, idx) => (
+        <div 
+          class="scroll-tilt-card group relative rounded-2xl p-7 glass-panel-relay border border-white/[0.08] hover:border-lime-400/40 transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-xl"
+          data-index={idx}
+        >
+          <!-- Stream glow on hover -->
+          <div class={`absolute top-0 right-0 w-36 h-36 bg-gradient-to-bl ${item.color} rounded-bl-full pointer-events-none transition-opacity duration-500 opacity-20 group-hover:opacity-70 blur-xl`}></div>
+
+          <div>
+            <div class="flex items-center justify-between mb-6">
+              <span class="font-mono text-[11px] text-lime-400 tracking-wider uppercase px-2.5 py-1 rounded bg-lime-400/10 border border-lime-400/20">
+                {item.tag}
+              </span>
+              <span class="font-mono text-xs text-slate-500">0{idx + 1}</span>
+            </div>
+
+            <h3 class="text-xl font-bold text-white mb-3 group-hover:text-lime-300 transition-colors">
+              {item.title}
+            </h3>
+
+            <p class="text-slate-300 text-sm leading-relaxed mb-6">
+              {item.desc}
+            </p>
+          </div>
+
+          <div class="pt-5 border-t border-white/[0.07] mt-auto">
+            <div class="flex items-center justify-between mb-3 text-[11px] font-mono">
+              <span class="text-slate-400 uppercase tracking-wider">Capacidades:</span>
+              <span class="text-lime-400 font-semibold">{item.statusText}</span>
+            </div>
+            <ul class="space-y-1.5 text-xs text-slate-300 font-mono">
+              {item.metrics.map(m => (
+                <li class="flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-lime-400"></span>
+                  {m}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- Scroll and Mouse Reactive 3D Tilt Script -->
+<script>
+  function setupScrollTiltCards() {
+    const cards = document.querySelectorAll('.scroll-tilt-card');
+    
+    // Mouse hover tilt
+    cards.forEach(card => {
+      card.addEventListener('mousemove', (e: any) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -8;
+        const rotateY = ((x - centerX) / centerX) * 8;
+
+        (card as HTMLElement).style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px) scale(1.02)`;
+      });
+
+      card.addEventListener('mouseleave', () => {
+        (card as HTMLElement).style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1)`;
+      });
+    });
+
+    // Scroll reactive parallax tilt
+    window.addEventListener('scroll', () => {
+      const windowHeight = window.innerHeight;
+      cards.forEach((card, index) => {
+        const rect = card.getBoundingClientRect();
+        // If card is on screen
+        if (rect.top < windowHeight && rect.bottom > 0) {
+          const progress = (rect.top - windowHeight / 2) / (windowHeight / 2); // -1 to 1
+          const scrollTilt = Math.sin(progress * Math.PI) * 2;
+          if (!(card as HTMLElement).matches(':hover')) {
+            (card as HTMLElement).style.transform = `perspective(1000px) rotateX(${scrollTilt}deg)`;
+          }
+        }
+      });
+    }, { passive: true });
+  }
+
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setupScrollTiltCards();
+  } else {
+    document.addEventListener('DOMContentLoaded', setupScrollTiltCards);
+  }
+</script>

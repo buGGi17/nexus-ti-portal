@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background-color: #04060a;
+  color: #f1f5f9;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  overflow-x: hidden;
+}
+
+/* Luxury Glassmorphism specifications (as in Relay video) */
+.glass-panel-relay {
+  background: linear-gradient(135deg, rgba(20, 26, 38, 0.65) 0%, rgba(9, 13, 20, 0.8) 100%);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.glass-panel-glow {
+  background: linear-gradient(135deg, rgba(20, 28, 40, 0.75) 0%, rgba(8, 12, 18, 0.85) 100%);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid rgba(200, 255, 0, 0.25);
+  box-shadow: 0 0 50px -10px rgba(200, 255, 0, 0.2), inset 0 1px 0 rgba(200, 255, 0, 0.3);
+}
+
+/* Subtle dot grid inspired by Relay */
+.bg-grid-dots {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #04060a;
+}
+::-webkit-scrollbar-thumb {
+  background: #192233;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #c8ff00;
+}

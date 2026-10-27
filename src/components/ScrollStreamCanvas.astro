@@ -1,0 +1,181 @@
+<div id="plasma-container" class="fixed inset-0 w-full h-full pointer-events-none -z-10 overflow-hidden">
+  <canvas id="plasma-canvas" class="w-full h-full block"></canvas>
+</div>
+
+<script>
+  import * as THREE from 'three';
+
+  function initScrollPlasmaStream() {
+    const container = document.getElementById('plasma-container');
+    const canvas = document.getElementById('plasma-canvas') as HTMLCanvasElement;
+    if (!container || !canvas) return;
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x04060a, 0.035);
+
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 0, 10);
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      alpha: true,
+      antialias: true,
+      powerPreference: 'high-performance'
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    // Custom Tube / Ribbon Curve simulating the Relay ethereal stream
+    const pointsCount = 60;
+    const curvePoints: THREE.Vector3[] = [];
+    for (let i = 0; i < pointsCount; i++) {
+      const t = (i / (pointsCount - 1)) * 2 - 1; // -1 to 1
+      const y = -t * 18;
+      const x = Math.sin(t * 3.5) * 4.5;
+      const z = Math.cos(t * 2.8) * 3 - 2;
+      curvePoints.push(new THREE.Vector3(x, y, z));
+    }
+
+    const curve = new THREE.CatmullRomCurve3(curvePoints);
+    curve.curveType = 'centripetal';
+
+    // 1. Bright glowing core line
+    const tubeGeo = new THREE.TubeGeometry(curve, 180, 0.12, 12, false);
+    const tubeMat = new THREE.MeshBasicMaterial({
+      color: 0xc8ff00,
+      transparent: true,
+      opacity: 0.85
+    });
+    const mainTube = new THREE.Mesh(tubeGeo, tubeMat);
+    scene.add(mainTube);
+
+    // 2. Wide translucent green plasma halo
+    const haloGeo = new THREE.TubeGeometry(curve, 180, 0.95, 12, false);
+    const haloMat = new THREE.MeshBasicMaterial({
+      color: 0x4ade80,
+      transparent: true,
+      opacity: 0.18,
+      wireframe: false,
+      side: THREE.DoubleSide
+    });
+    const haloTube = new THREE.Mesh(haloGeo, haloMat);
+    scene.add(haloTube);
+
+    // 3. Floating interactive micro-particles (Data packets flowing along the stream)
+    const particleCount = 450;
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+    const particleProgress = new Float32Array(particleCount);
+
+    for (let i = 0; i < particleCount; i++) {
+      particleProgress[i] = Math.random();
+      const p = curve.getPointAt(particleProgress[i]);
+      positions[i * 3] = p.x + (Math.random() - 0.5) * 1.5;
+      positions[i * 3 + 1] = p.y + (Math.random() - 0.5) * 1.5;
+      positions[i * 3 + 2] = p.z + (Math.random() - 0.5) * 1.5;
+
+      const isLime = Math.random() > 0.3;
+      if (isLime) {
+        colors[i * 3] = 0.78;
+        colors[i * 3 + 1] = 1.0;
+        colors[i * 3 + 2] = 0.0;
+      } else {
+        colors[i * 3] = 0.0;
+        colors[i * 3 + 1] = 0.95;
+        colors[i * 3 + 2] = 1.0;
+      }
+    }
+
+    const particlesGeo = new THREE.BufferGeometry();
+    particlesGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    particlesGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    const particlesMat = new THREE.PointsMaterial({
+      size: 0.06,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.8
+    });
+    const particleMesh = new THREE.Points(particlesGeo, particlesMat);
+    scene.add(particleMesh);
+
+    // Track scroll & mouse
+    let scrollY = 0;
+    let targetScrollY = 0;
+    let mouseX = 0;
+    let mouseY = 0;
+    let targetMouseX = 0;
+    let targetMouseY = 0;
+
+    function onScroll() {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      targetScrollY = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+    }
+
+    function onMouseMove(e: MouseEvent) {
+      targetMouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+      targetMouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+
+    function onResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+    window.addEventListener('resize', onResize);
+
+    const clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = clock.getDelta();
+      const time = clock.getElapsedTime();
+
+      // Smooth interpolations
+      scrollY += (targetScrollY - scrollY) * 0.08;
+      mouseX += (targetMouseX - mouseX) * 0.05;
+      mouseY += (targetMouseY - mouseY) * 0.05;
+
+      // Scroll transitions the camera Y and rotation along the stream
+      camera.position.y = -scrollY * 14 + 1;
+      camera.position.x = Math.sin(scrollY * Math.PI * 2) * 1.8 + mouseX * 0.6;
+      camera.position.z = 10 - scrollY * 2;
+      camera.lookAt(
+        Math.sin(scrollY * Math.PI) * 1.2,
+        camera.position.y - 0.5,
+        -scrollY * 4
+      );
+
+      // Subtle dynamic breathing wave in the ribbon
+      mainTube.rotation.y = Math.sin(time * 0.3) * 0.05;
+      haloTube.rotation.y = Math.sin(time * 0.3) * 0.05;
+
+      // Move particles along the spline curve
+      const posAttr = particlesGeo.attributes.position as THREE.BufferAttribute;
+      for (let i = 0; i < particleCount; i++) {
+        particleProgress[i] = (particleProgress[i] + delta * 0.05) % 1;
+        const p = curve.getPointAt(particleProgress[i]);
+        posAttr.setXYZ(
+          i,
+          p.x + Math.sin(time + i) * 0.3,
+          p.y + Math.cos(time + i) * 0.3,
+          p.z
+        );
+      }
+      posAttr.needsUpdate = true;
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+  }
+
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initScrollPlasmaStream();
+  } else {
+    document.addEventListener('DOMContentLoaded', initScrollPlasmaStream);
+  }
+</script>

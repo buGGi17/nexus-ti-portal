@@ -1,0 +1,213 @@
+<div id="aurora-container" class="fixed inset-0 w-full h-full pointer-events-none -z-10 overflow-hidden">
+  <canvas id="aurora-canvas" class="w-full h-full block"></canvas>
+</div>
+
+<script>
+  import * as THREE from 'three';
+
+  /**
+   * GLSL Aurora Boreal Shader (Relay Inspired)
+   * Usa FBM (Fractal Brownian Motion) y Simplex Noise para generar
+   * los pliegues de luz de gas ionizado (aurora) en tiempo real en la GPU.
+   */
+
+  const vertexShader = `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = vec4(position, 1.0);
+    }
+  `;
+
+  const fragmentShader = `
+    precision highp float;
+    varying vec2 vUv;
+
+    uniform float uTime;
+    uniform float uScroll;
+    uniform vec2 uMouse;
+    uniform vec2 uResolution;
+
+    // Simplex Noise 2D / 3D Implementation
+    vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+    vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+    vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+
+    float snoise(vec2 v) {
+      const vec4 C = vec4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0
+                          0.366025403784439,  // 0.5*(sqrt(3.0)-1.0)
+                         -0.577350269189626,  // -1.0 + 2.0 * C.x
+                          0.024390243902439); // 1.0 / 41.0
+      vec2 i  = floor(v + dot(v, C.yy));
+      vec2 x0 = v -   i + dot(i, C.xx);
+      vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+      vec4 x12 = x0.xyxy + C.xxzz;
+      x12.xy -= i1;
+      i = mod289(i);
+      vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0));
+      vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+      m = m*m;
+      m = m*m;
+      vec3 x = 2.0 * fract(p * C.www) - 1.0;
+      vec3 h = abs(x) - 0.5;
+      vec3 ox = floor(x + 0.5);
+      vec3 a0 = x - ox;
+      m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
+      vec3 g;
+      g.x  = a0.x  * x0.x  + h.x  * x0.y;
+      g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+      return 130.0 * dot(m, g);
+    }
+
+    // Fractal Brownian Motion (FBM) que crea las hebras volumétricas de la aurora
+    float fbm(vec2 st) {
+      float value = 0.0;
+      float amplitude = 0.5;
+      float frequency = 1.0;
+      for (int i = 0; i < 5; i++) {
+        value += amplitude * snoise(st * frequency);
+        frequency *= 2.05;
+        amplitude *= 0.5;
+      }
+      return value;
+    }
+
+    void main() {
+      // Coordenadas normalizadas con aspect ratio
+      vec2 uv = (gl_FragCoord.xy - 0.5 * uResolution.xy) / min(uResolution.x, uResolution.y);
+
+      // Desplazamiento dinámico por scroll y mouse
+      float scrollOffset = uScroll * 3.5;
+      vec2 mouseOffset = uMouse * 0.25;
+
+      // Generar la trayectoria curvada serpenteante de la cinta
+      // La cinta se ondula a lo largo de la pantalla verticalmente
+      float ribbonCurve = sin(uv.y * 2.2 + uTime * 0.4 - scrollOffset) * 0.45;
+      ribbonCurve += cos(uv.y * 4.5 - uTime * 0.25) * 0.18;
+      ribbonCurve += mouseOffset.x * (1.0 - abs(uv.y));
+
+      // Distancia a la columna vertebral de la cinta
+      float distToRibbon = abs(uv.x - ribbonCurve + 0.15);
+
+      // Dominio deformado (Domain Warping) para crear filamentos de humo etéreo
+      vec2 warpCoords = uv * 1.8;
+      warpCoords.y += uTime * 0.15 - scrollOffset * 0.5;
+      float n1 = fbm(warpCoords);
+      float n2 = fbm(warpCoords + vec2(n1 * 1.5, n1 * 1.2) + vec2(uTime * 0.1));
+      float plasmaNoise = fbm(warpCoords + vec2(n2 * 2.0, n2 * 1.8));
+
+      // Ancho del haz y decaimiento luminoso
+      float ribbonGlow = 0.035 / (distToRibbon + 0.08);
+      float filament = smoothstep(0.7, 0.1, distToRibbon) * abs(plasmaNoise);
+
+      // Intensidad final combinada
+      float intensity = ribbonGlow * 0.8 + filament * 1.4;
+
+      // Atenuación suave en los bordes horizontales
+      intensity *= smoothstep(1.2, 0.2, abs(uv.x));
+
+      // Paleta cromática Relay: Verde lima brillante + Esmeralda suave + Cian profundo
+      vec3 colorCore = vec3(0.78, 1.0, 0.0);    // #c8ff00 (Lime vibrante)
+      vec3 colorMid  = vec3(0.15, 0.85, 0.45);  // Aurora green
+      vec3 colorCyan = vec3(0.0, 0.75, 0.95);   // Cyan etéreo
+
+      // Mezcla de colores en función de la altura y la turbulencia del noise
+      vec3 finalColor = mix(colorCyan, colorMid, clamp(uv.y * 0.5 + 0.5 + n1 * 0.4, 0.0, 1.0));
+      finalColor = mix(finalColor, colorCore, clamp(pow(intensity * 0.6, 2.0), 0.0, 1.0));
+
+      // Aplicar viñeta ultra oscura de fondo (#04060a)
+      float alpha = clamp(intensity * 0.85, 0.0, 0.92);
+      gl_FragColor = vec4(finalColor * intensity, alpha);
+    }
+  `;
+
+  function initAuroraShader() {
+    const canvas = document.getElementById('aurora-canvas') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      alpha: true,
+      powerPreference: 'high-performance'
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+    const uniforms = {
+      uTime: { value: 0 },
+      uScroll: { value: 0 },
+      uMouse: { value: new THREE.Vector2(0, 0) },
+      uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
+    };
+
+    const material = new THREE.ShaderMaterial({
+      vertexShader,
+      fragmentShader,
+      uniforms,
+      transparent: true,
+      blending: THREE.AdditiveBlending
+    });
+
+    const geometry = new THREE.PlaneGeometry(2, 2);
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+
+    // Scroll & Mouse Tracking con suavizado (lerp)
+    let targetScroll = 0;
+    let currentScroll = 0;
+    let targetMouseX = 0;
+    let targetMouseY = 0;
+    let currentMouseX = 0;
+    let currentMouseY = 0;
+
+    function handleScroll() {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      targetScroll = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+    }
+
+    function handleMouseMove(e: MouseEvent) {
+      targetMouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+      targetMouseY = -(e.clientY / window.innerHeight - 0.5) * 2;
+    }
+
+    function handleResize() {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      renderer.setSize(width, height);
+      uniforms.uResolution.value.set(width, height);
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('resize', handleResize);
+
+    const clock = new THREE.Clock();
+
+    function renderLoop() {
+      requestAnimationFrame(renderLoop);
+      const elapsed = clock.getElapsedTime();
+
+      // Suavizado cinemático
+      currentScroll += (targetScroll - currentScroll) * 0.06;
+      currentMouseX += (targetMouseX - currentMouseX) * 0.05;
+      currentMouseY += (targetMouseY - currentMouseY) * 0.05;
+
+      uniforms.uTime.value = elapsed;
+      uniforms.uScroll.value = currentScroll;
+      uniforms.uMouse.value.set(currentMouseX, currentMouseY);
+
+      renderer.render(scene, camera);
+    }
+
+    renderLoop();
+  }
+
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initAuroraShader();
+  } else {
+    document.addEventListener('DOMContentLoaded', initAuroraShader);
+  }
+</script>

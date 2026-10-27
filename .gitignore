@@ -1,0 +1,31 @@
+# Build & Dependencies
+node_modules/
+dist/
+.astro/
+
+# Environment & Local Config
+.env
+.env.local
+.env.*.local
+
+# Media & Videos
+*.mp4
+website-inspiration.mp4
+
+# AI Agents, Tools & Skills metadata
+.agent/
+.agents/
+.claude/
+.gemini/
+.impeccable/
+.opencode/
+.pi/
+skills-lock.json
+
+# System & Editor
+.DS_Store
+Thumbs.db
+*.log
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
